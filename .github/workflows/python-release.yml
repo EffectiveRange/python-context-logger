@@ -1,0 +1,33 @@
+name: Python release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish-and-release:
+    name: Publish and release distributions
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      discussions: write
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.ACTION_ACCESS_TOKEN }}
+
+    outputs:
+      artifact_id: ${{ steps.publish.outputs.artifact-id }}
+      artifact_url: ${{ steps.publish.outputs.artifact-url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Package and publish
+        uses: EffectiveRange/python-package-github-action@v1
+        with:
+          debian-dist-type: 'library'
+      - name: Release
+        uses: EffectiveRange/version-release-github-action@v1
