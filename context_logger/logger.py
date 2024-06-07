@@ -43,10 +43,10 @@ def get_logger(logger_name: str) -> Any:
 
 def setup_logging(application_name: str, log_level: str = 'INFO',
                   log_file_path: Optional[str] = None, max_bytes: int = 1024 * 1024, backup_count: int = 5,
-                  add_call_info: bool = False, message_field: str = 'message') -> None:
+                  add_call_info: bool = False, warn_on_overwrite: bool = True, message_field: str = 'message') -> None:
     global STRUCTURED_LOGGER
 
-    if STRUCTURED_LOGGER is not None:
+    if warn_on_overwrite and STRUCTURED_LOGGER:
         warnings.warn('Logging has already been set up, overwriting existing configuration.', UserWarning)
 
     STRUCTURED_LOGGER = StructuredLogger(application_name, log_level, log_file_path, max_bytes, backup_count,
