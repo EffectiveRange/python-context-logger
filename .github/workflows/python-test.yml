@@ -23,7 +23,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Verify changes
-        uses: GlobalScope-HUN/python-verify-action@v1
+        uses: EffectiveRange/python-verify-github-action@v1
         with:
           add-coverage-comment: 'false'
           coverage-threshold: '95'
