@@ -15,9 +15,6 @@ jobs:
       contents: write
       discussions: write
 
-    env:
-      GITHUB_TOKEN: ${{ secrets.ACTION_ACCESS_TOKEN }}
-
     outputs:
       artifact_id: ${{ steps.publish.outputs.artifact-id }}
       artifact_url: ${{ steps.publish.outputs.artifact-url }}

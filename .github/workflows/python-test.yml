@@ -14,10 +14,7 @@ jobs:
       # Gives the action the necessary permissions for publishing new
       # comments in pull requests.
       pull-requests: write
-      contents: read
-
-    env:
-      GITHUB_TOKEN: ${{ secrets.ACTION_ACCESS_TOKEN }}
+      contents: write
 
     steps:
       - name: Check out repository
@@ -25,5 +22,4 @@ jobs:
       - name: Verify changes
         uses: EffectiveRange/python-verify-github-action@v1
         with:
-          add-coverage-comment: 'false'
           coverage-threshold: '95'
