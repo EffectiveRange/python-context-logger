@@ -15,12 +15,8 @@ jobs:
       contents: write
       discussions: write
 
-    outputs:
-      artifact_id: ${{ steps.publish.outputs.artifact-id }}
-      artifact_url: ${{ steps.publish.outputs.artifact-url }}
-
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
       - name: Package and publish
         uses: EffectiveRange/python-package-github-action@v1

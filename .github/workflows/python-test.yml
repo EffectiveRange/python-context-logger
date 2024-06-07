@@ -17,7 +17,7 @@ jobs:
       contents: write
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
       - name: Verify changes
         uses: EffectiveRange/python-verify-github-action@v1
