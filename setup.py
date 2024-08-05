@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='python-context-logger',
-    version='1.1.6',
+    version='1.1.7',
     description='Contextual structured logging library for Python',
     author='Ferenc Nandor Janky & Attila Gombos',
     author_email='info@effective-range.com',
