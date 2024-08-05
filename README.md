@@ -47,7 +47,7 @@ pip install .
 
 1. Create source distribution
     ```bash
-    pip setup.py sdist
+    python setup.py sdist
     ```
 
 2. Install from distribution file

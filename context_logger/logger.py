@@ -11,13 +11,12 @@ from logging.handlers import RotatingFileHandler
 from typing import Any, Optional
 
 import structlog
-from context_logger import ContextSetupFilter
-from structlog._log_levels import add_log_level
 from structlog.dev import ConsoleRenderer
-from structlog.processors import JSONRenderer, StackInfoRenderer, TimeStamper, EventRenamer, format_exc_info, \
-    UnicodeDecoder, CallsiteParameterAdder
+from structlog.processors import JSONRenderer, StackInfoRenderer, TimeStamper, format_exc_info, UnicodeDecoder
 from structlog.stdlib import ProcessorFormatter, LoggerFactory, BoundLogger, PositionalArgumentsFormatter, \
-    add_logger_name
+    add_logger_name, add_log_level
+
+from context_logger import ContextSetupFilter
 
 LOGGER = None
 
@@ -73,7 +72,7 @@ class Logger(object):
             root.removeHandler(handler)
 
     def _setup_processors(self) -> None:
-        self._shared_processors: Any = [
+        self._shared_processors: list[Any] = [
             add_log_level,
             add_logger_name,
             PositionalArgumentsFormatter(),
@@ -86,19 +85,25 @@ class Logger(object):
         if self._add_call_info:
             self._add_call_info_processor()
 
-        self._shared_processors.append(EventRenamer(self._message_field))
+        try:
+            self._shared_processors.append(structlog.processors.EventRenamer(self._message_field))
+        except AttributeError:
+            pass
 
     def _add_call_info_processor(self) -> None:
-        self._shared_processors.append(CallsiteParameterAdder(
-            {
-                structlog.processors.CallsiteParameter.MODULE,
-                structlog.processors.CallsiteParameter.PATHNAME,
-                structlog.processors.CallsiteParameter.FUNC_NAME,
-                structlog.processors.CallsiteParameter.LINENO,
-                structlog.processors.CallsiteParameter.PROCESS_NAME,
-                structlog.processors.CallsiteParameter.THREAD_NAME
-            }
-        ))
+        try:
+            self._shared_processors.append(structlog.processors.CallsiteParameterAdder(
+                {
+                    structlog.processors.CallsiteParameter.MODULE,
+                    structlog.processors.CallsiteParameter.PATHNAME,
+                    structlog.processors.CallsiteParameter.FUNC_NAME,
+                    structlog.processors.CallsiteParameter.LINENO,
+                    structlog.processors.CallsiteParameter.PROCESS_NAME,
+                    structlog.processors.CallsiteParameter.THREAD_NAME
+                }
+            ))
+        except AttributeError:
+            pass
 
     def _create_handlers(self) -> None:
         root = logging.getLogger()
@@ -116,10 +121,13 @@ class Logger(object):
             root.addHandler(handler)
 
     def _create_console_handler(self) -> Handler:
-        formatter = ProcessorFormatter(
-            foreign_pre_chain=self._shared_processors + [self._enrich_stdlib_log],
-            processors=[ProcessorFormatter.remove_processors_meta, ConsoleRenderer(event_key=self._message_field)]
-        )
+        try:
+            formatter = ProcessorFormatter(
+                foreign_pre_chain=self._get_foreign_prechain(),
+                processors=[ProcessorFormatter.remove_processors_meta, ConsoleRenderer(event_key=self._message_field)]
+            )
+        except AttributeError:
+            formatter = ProcessorFormatter(foreign_pre_chain=self._get_foreign_prechain(), processor=ConsoleRenderer())
 
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(formatter)
@@ -128,10 +136,11 @@ class Logger(object):
         return handler
 
     def _create_file_handler(self, log_file_path: str) -> RotatingFileHandler:
-        formatter = ProcessorFormatter(
-            foreign_pre_chain=self._shared_processors + [self._enrich_stdlib_log],
-            processors=[ProcessorFormatter.remove_processors_meta, JSONRenderer()]
-        )
+        try:
+            formatter = ProcessorFormatter(foreign_pre_chain=self._get_foreign_prechain(),
+                                           processors=[ProcessorFormatter.remove_processors_meta, JSONRenderer()])
+        except AttributeError:
+            formatter = ProcessorFormatter(foreign_pre_chain=self._get_foreign_prechain(), processor=JSONRenderer())
 
         self._ensure_directory_exists(log_file_path)
 
@@ -151,3 +160,6 @@ class Logger(object):
         event_dict.update(event_dict['_record'].msg)
 
         return event_dict
+
+    def _get_foreign_prechain(self) -> list[Any]:
+        return self._shared_processors + [self._enrich_stdlib_log]
