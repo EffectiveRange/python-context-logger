@@ -48,11 +48,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Package and publish
         uses: EffectiveRange/python-package-github-action@v2
         with:
           use-devcontainer: 'true'
           container-config: 'armhf-container'
-          packaging-command: 'pack_python . --all'
+          debian-dist-type: 'fpm-deb'
       - name: Release
         uses: EffectiveRange/version-release-github-action@v1
