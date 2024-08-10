@@ -54,7 +54,8 @@ jobs:
         uses: EffectiveRange/python-package-github-action@v2
         with:
           use-devcontainer: 'true'
-          container-config: 'armhf-container'
+          container-config: 'amd64-container'
           debian-dist-type: 'fpm-deb'
+          install-packaging-tools: 'false'
       - name: Release
         uses: EffectiveRange/version-release-github-action@v1
