@@ -1,103 +1,42 @@
-# python-context-logger
-Contextual structured logging library for Python.
+# Repository Coverage
 
-Uses [structlog](https://www.structlog.org/en/stable/) to provide structured logging with minimal setup.
+[Full report](https://htmlpreview.github.io/?https://github.com/EffectiveRange/python-context-logger/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-## Table of contents
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [New in 1.1.0](#new-in-110)
+| Name                            |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
+|-------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
+| context\_logger/\_\_init\_\_.py |        2 |        0 |        0 |        0 |    100% |           |
+| context\_logger/filter.py       |       23 |        0 |        4 |        0 |    100% |           |
+| context\_logger/logger.py       |       92 |        8 |       14 |        0 |     92% |90-91, 105-106, 129-130, 142-143 |
+| tests/loggerTest.py             |       86 |        0 |        8 |        4 |     96% |26->exit, 43->exit, 70->exit, 106->exit |
+|                       **TOTAL** |  **203** |    **8** |   **26** |    **4** | **95%** |           |
 
-## Features
 
-- Structured logging
-- Contextual logging
-- Colorized console output
-- JSON line file output
-- Easy setup
-- [New in 1.1.0](#new-in-110) Standard library log messages are also captured, enriched and formatted
+## Setup coverage badge
 
-Contextual information is added to each structured log message on any thread, including:
-- Application name
-- Application version
-- Hostname
-- Logger name
-- Log level
-- Timestamp
-- [New in 1.1.0](#new-in-110) Optional call information (module name, filename, line number, function name, process name, thread name)
+Below are examples of the badges you can use in your main branch `README` file.
 
-Custom fields can be added to each log message
+### Direct image
 
-## Requirements
+[![Coverage badge](https://raw.githubusercontent.com/EffectiveRange/python-context-logger/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/EffectiveRange/python-context-logger/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-- [Python3](https://www.python.org/downloads/)
-- [structlog](https://www.structlog.org/en/stable/)
+This is the one to use if your repository is private or if you don't want to customize anything.
 
-## Installation
+### [Shields.io](https://shields.io) Json Endpoint
 
-### Install from source root directory
+[![Coverage badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/EffectiveRange/python-context-logger/python-coverage-comment-action-data/endpoint.json)](https://htmlpreview.github.io/?https://github.com/EffectiveRange/python-context-logger/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-```bash
-pip install .
-```
+Using this one will allow you to [customize](https://shields.io/endpoint) the look of your badge.
+It won't work with private repositories. It won't be refreshed more than once per five minutes.
 
-### Install from source distribution
+### [Shields.io](https://shields.io) Dynamic Badge
 
-1. Create source distribution
-    ```bash
-    python setup.py sdist
-    ```
+[![Coverage badge](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=coverage&query=%24.message&url=https%3A%2F%2Fraw.githubusercontent.com%2FEffectiveRange%2Fpython-context-logger%2Fpython-coverage-comment-action-data%2Fendpoint.json)](https://htmlpreview.github.io/?https://github.com/EffectiveRange/python-context-logger/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-2. Install from distribution file
-    ```bash
-    pip install dist/python_context_logger-1.0.0.tar.gz
-    ```
-   
-3. Install from GitHub repository
-    ```bash
-    pip install git+https://github.com/EffectiveRange/python-context-logger.git@latest
-    ```
+This one will always be the same color. It won't work for private repos. I'm not even sure why we included it.
 
-## Usage
-Example usage:
-```python
-from context_logger import get_logger, setup_logging
+## What is that?
 
-log = get_logger('ExampleClass')
-
-setup_logging('example-app', 'INFO', 'logs/example.log')
-
-log.info('This is a simple message')
-log.error('This is an error message', error_message='Something terrible happened', error_code=1234)
-```
-Console output (colored):
-```
-2024-02-16T12:49:41.733384Z [info     ] This is a simple message       [ExampleClass] app_version=0.0.1 application=example-app hostname=example-host
-2024-02-16T12:49:41.734073Z [error    ] This is an error message       [ExampleClass] app_version=0.0.1 application=example-app error_code=1234 error_message=Something terrible happened hostname=example-host
-```
-File output (logs/example.log):
-```
-{"logger": "ExampleClass", "level": "info", "timestamp": "2024-02-16T12:49:41.733384Z", "message": "This is a simple message", "hostname": "example-host", "app_version": "0.0.1", "application": "example-app"}
-{"error_message": "Something terrible happened", "error_code": 1234, "logger": "ExampleClass", "level": "error", "timestamp": "2024-02-16T12:49:41.734073Z", "message": "This is an error message", "hostname": "example-host", "app_version": "0.0.1", "application": "example-app"}
-```
-### New in 1.1.0
-Example usage with call information and standard library logging:
-```python
-import logging
-from context_logger import get_logger, setup_logging
-
-setup_logging('example-app', add_call_info=True)
-
-log = get_logger('ExampleClass')
-stdlib_log = logging.getLogger('StdLibClass')
-
-log.info('This is a simple message')
-stdlib_log.info('This is a simple message')
-```
-Console output (colored):
-```
-2024-02-26T14:55:40.320668Z [info     ] This is a simple message       [ExampleClass] app_version=0.0.1 application=example-app func_name=test_file_logging hostname=example-host lineno=27 module=test_logger pathname=/home/attila/Work/context-logger/tests/test_logger.py process_name=MainProcess thread_name=MainThread
-2024-02-26T14:55:40.326201Z [info     ] This is a simple message       [StdLibClass] app_version=0.0.1 application=example-app func_name=test_file_logging hostname=example-host lineno=28 module=test_logger pathname=/home/attila/Work/context-logger/tests/test_logger.py process_name=MainProcess thread_name=MainThread
-```
+This branch is part of the
+[python-coverage-comment-action](https://github.com/marketplace/actions/python-coverage-comment)
+GitHub Action. All the files in this branch are automatically generated and may be
+overwritten at any moment.
