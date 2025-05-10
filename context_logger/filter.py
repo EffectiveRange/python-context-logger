@@ -15,16 +15,19 @@ class ContextSetupFilter(Filter):
         self._message_field = message_field
 
     def filter(self, record: LogRecord) -> bool:
-        if not isinstance(record.msg, dict):
-            record.msg = {self._message_field: record.msg % record.args}
-            record.args = ()
+        try:
+            if isinstance(record.msg, str):
+                record.msg = {self._message_field: record.msg % record.args if record.args else record.msg}
+                record.args = ()
 
-        record.msg['hostname'] = socket.gethostname()
-        record.msg['application'] = self._application_name
-        record.msg['app_version'] = self._get_application_version()
+            record.msg['hostname'] = socket.gethostname()
+            record.msg['application'] = self._application_name
+            record.msg['app_version'] = self._get_application_version()
 
-        if 'process_name' in record.msg:
-            record.msg['process_name'] = record.processName
+            if 'process_name' in record.msg:
+                record.msg['process_name'] = record.processName
+        except Exception as exception:
+            print('Failed to handle log record:', exception)
 
         return True
 
