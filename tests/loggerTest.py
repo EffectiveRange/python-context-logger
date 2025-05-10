@@ -62,6 +62,7 @@ class LoggerTest(TestCase):
         # When
         log.info('This is a simple message')
         stdlib_log.info('This is a %s message', 'simple')
+        stdlib_log.info('This is a %s message', )
         log.error('This is an error message', error_message='Something terrible happened', error_code=1234)
         stdlib_log.error('This is an error message')
 
@@ -73,6 +74,9 @@ class LoggerTest(TestCase):
 
             log_entry = json.loads(log_file.readline())
             assert_simple_message(self, log_entry)
+
+            log_entry = json.loads(log_file.readline())
+            self.assertEqual('This is a %s message', log_entry.get('message'))
 
             log_entry = json.loads(log_file.readline())
             self.assertEqual('This is an error message', log_entry.get('message'))
