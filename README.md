@@ -2,13 +2,12 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/EffectiveRange/python-context-logger/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                            |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|-------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| context\_logger/\_\_init\_\_.py |        2 |        0 |        0 |        0 |    100% |           |
-| context\_logger/filter.py       |       23 |        0 |        4 |        0 |    100% |           |
-| context\_logger/logger.py       |       92 |        8 |       14 |        0 |     92% |90-91, 105-106, 129-130, 142-143 |
-| tests/loggerTest.py             |       86 |        0 |        8 |        4 |     96% |26->exit, 43->exit, 70->exit, 106->exit |
-|                       **TOTAL** |  **203** |    **8** |   **26** |    **4** | **95%** |           |
+| Name                            |    Stmts |     Miss |   Branch |   BrPart |    Cover |   Missing |
+|-------------------------------- | -------: | -------: | -------: | -------: | -------: | --------: |
+| context\_logger/\_\_init\_\_.py |        2 |        0 |        0 |        0 |     100% |           |
+| context\_logger/filter.py       |       31 |        0 |        8 |        0 |     100% |           |
+| context\_logger/logger.py       |       93 |        0 |       14 |        0 |     100% |           |
+| **TOTAL**                       |  **126** |    **0** |   **22** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
