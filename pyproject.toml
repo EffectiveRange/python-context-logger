@@ -1,0 +1,33 @@
+[project]
+name = "python-context-logger"
+description = "Contextual structured logging library for Python"
+authors = [
+    { name = "Ferenc Nandor Janky & Attila Gombos", email = "info@effective-range.com" }
+]
+maintainers = [
+    { name = "Ferenc Nandor Janky & Attila Gombos", email = "info@effective-range.com" }
+]
+dependencies = [
+    "structlog"
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["context_logger"]
+
+[tool.setuptools.package-data]
+hello = ["py.typed"]
+
+[build-system]
+requires = ["setuptools>=61", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+
+[tool.pytest]
+addopts = ["--verbose", "--capture=no"]
+python_files = ["*Test.py"]
+python_classes = ["*Test"]
