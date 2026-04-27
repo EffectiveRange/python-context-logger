@@ -5,14 +5,16 @@
 import socket
 from importlib.metadata import version, PackageNotFoundError
 from logging import Filter, LogRecord
+from typing import Any
 
 
 class ContextSetupFilter(Filter):
 
-    def __init__(self, application_name: str, message_field: str):
+    def __init__(self, application_name: str, message_field: str, global_context: dict[str, Any] | None = None):
         super().__init__()
         self._application_name = application_name
         self._message_field = message_field
+        self._global_context = global_context if global_context else {}
 
     def filter(self, record: LogRecord) -> bool:
         try:
@@ -26,6 +28,11 @@ class ContextSetupFilter(Filter):
 
             if 'process_name' in record.msg:
                 record.msg['process_name'] = record.processName
+
+            for key, value in self._global_context.items():
+                if key not in record.msg:
+                    record.msg[key] = str(value)
+
         except Exception as exception:
             print('Failed to handle log record:', exception)
 

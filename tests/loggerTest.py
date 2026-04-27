@@ -19,7 +19,7 @@ class LoggerTest(TestCase):
 
     def test_structlog_logging(self):
         # Given
-        setup_logging('example-app', warn_on_overwrite=False)
+        setup_logging('example-app', warn_on_overwrite=False, global_context={'global1': 'value1'})
 
         log = get_logger('ExampleClass')
 
@@ -36,7 +36,7 @@ class LoggerTest(TestCase):
 
     def test_stdlib_logging(self):
         # Given
-        setup_logging('example-app', warn_on_overwrite=False)
+        setup_logging('example-app', warn_on_overwrite=False, global_context={'global1': 'value1'})
 
         stdlib_log = logging.getLogger('ExampleClass')
 
@@ -54,7 +54,8 @@ class LoggerTest(TestCase):
         # Given
         log_file_path = f'{TESTS_DIR_PATH}/logs/example.log'
         shutil.rmtree(os.path.dirname(log_file_path), ignore_errors=True)
-        setup_logging('example-app', 'INFO', log_file_path, add_call_info=True, warn_on_overwrite=False)
+        setup_logging('example-app', 'INFO', log_file_path, add_call_info=True, warn_on_overwrite=False,
+                      global_context={'global1': 'value1'})
 
         log = get_logger('ExampleClass')
         stdlib_log = logging.getLogger('ExampleClass')
@@ -82,6 +83,7 @@ class LoggerTest(TestCase):
             self.assertEqual('This is an error message', log_entry.get('message'))
             self.assertEqual('Something terrible happened', log_entry.get('error_message'))
             self.assertEqual(1234, log_entry.get('error_code'))
+            self.assertEqual('value1', log_entry.get('global1'))
             self.assertIsNotNone(log_entry.get('pathname'))
             self.assertIsNotNone(log_entry.get('func_name'))
             self.assertIsNotNone(log_entry.get('lineno'))
@@ -99,7 +101,8 @@ class LoggerTest(TestCase):
         stdlib_log = logging.getLogger('ExampleClass')
 
         # When
-        setup_logging('example-app', 'ERROR', log_file_path, add_call_info=False, message_field='msg')
+        setup_logging('example-app', 'ERROR', log_file_path, add_call_info=False, message_field='msg',
+                      global_context={'global1': 'value1'})
 
         log.info('This is a simple message')
         stdlib_log.error('This is an error message')
@@ -115,6 +118,7 @@ class LoggerTest(TestCase):
             self.assertEqual('This is an error message', log_entry.get('msg'))
             self.assertEqual('Something terrible happened', log_entry.get('error_message'))
             self.assertEqual(1234, log_entry.get('error_code'))
+            self.assertEqual('value1', log_entry.get('global1'))
             self.assertIsNone(log_entry.get('pathname'))
             self.assertIsNone(log_entry.get('func_name'))
             self.assertIsNone(log_entry.get('lineno'))

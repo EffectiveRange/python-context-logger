@@ -27,7 +27,8 @@ def get_logger(logger_name: str) -> Any:
 
 def setup_logging(application_name: str, log_level: str = 'INFO',
                   log_file_path: Optional[str] = None, max_bytes: int = 1024 * 1024, backup_count: int = 5,
-                  add_call_info: bool = False, warn_on_overwrite: bool = True, message_field: str = 'message') -> None:
+                  add_call_info: bool = False, warn_on_overwrite: bool = True, message_field: str = 'message',
+                  global_context: dict[str, Any] | None = None) -> None:
     global LOGGER
 
     if LOGGER:
@@ -36,7 +37,8 @@ def setup_logging(application_name: str, log_level: str = 'INFO',
 
         LOGGER.cleanup()
 
-    LOGGER = Logger(application_name, log_level, log_file_path, max_bytes, backup_count, add_call_info, message_field)
+    LOGGER = Logger(application_name, log_level, log_file_path, max_bytes, backup_count, add_call_info, message_field,
+                    global_context)
 
     LOGGER.setup()
 
@@ -44,14 +46,16 @@ def setup_logging(application_name: str, log_level: str = 'INFO',
 class Logger(object):
 
     def __init__(self, application_name: str, log_level: str, log_file_path: Optional[str], max_bytes: int,
-                 backup_count: int, add_call_info: bool, message_field: str) -> None:
+                 backup_count: int, add_call_info: bool, message_field: str,
+                 global_context: dict[str, Any] | None = None) -> None:
         self._application_name = application_name
         self._log_level = logging.getLevelName(log_level.upper())
         self._log_file_path = log_file_path
         self._max_bytes = max_bytes
         self._backup_count = backup_count
-        self._message_field = message_field
         self._add_call_info = add_call_info
+        self._message_field = message_field
+        self._global_context = global_context
         self._handlers: list[Handler] = []
 
     def setup(self) -> None:
@@ -131,7 +135,7 @@ class Logger(object):
 
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(formatter)
-        handler.addFilter(ContextSetupFilter(self._application_name, self._message_field))
+        handler.addFilter(ContextSetupFilter(self._application_name, self._message_field, self._global_context))
 
         return handler
 
@@ -146,7 +150,7 @@ class Logger(object):
 
         handler = RotatingFileHandler(log_file_path, maxBytes=self._max_bytes, backupCount=self._backup_count)
         handler.setFormatter(formatter)
-        handler.addFilter(ContextSetupFilter(self._application_name, self._message_field))
+        handler.addFilter(ContextSetupFilter(self._application_name, self._message_field, self._global_context))
 
         return handler
 
