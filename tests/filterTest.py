@@ -70,6 +70,25 @@ class FilterTest(TestCase):
         # Then
         self.assertTrue(result)
         self.assertEqual(123, record.msg)
+        print_mock.assert_not_called()
+
+    def test_filter_handles_unexpected_version_lookup_error(self):
+        # Given
+        filter_ = ContextSetupFilter('example-app', 'message')
+        record = logging.LogRecord('ExampleClass', logging.INFO, __file__, 10, 'Hello', (), None)
+
+        with patch('context_logger.filter.socket.gethostname', return_value='test-host'), \
+                patch.object(filter_, '_get_application_version', side_effect=RuntimeError('boom')), \
+                patch('builtins.print') as print_mock:
+            # When
+            result = filter_.filter(record)
+
+        # Then
+        self.assertTrue(result)
+        self.assertEqual('Hello', record.msg.get('message'))
+        self.assertEqual('test-host', record.msg.get('hostname'))
+        self.assertEqual('example-app', record.msg.get('application'))
+        self.assertNotIn('app_version', record.msg)
         print_mock.assert_called_once()
         self.assertEqual('Failed to handle log record:', print_mock.call_args.args[0])
 
