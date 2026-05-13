@@ -5,9 +5,9 @@
 | Name                            |    Stmts |     Miss |   Branch |   BrPart |    Cover |   Missing |
 |-------------------------------- | -------: | -------: | -------: | -------: | -------: | --------: |
 | context\_logger/\_\_init\_\_.py |        2 |        0 |        0 |        0 |     100% |           |
-| context\_logger/filter.py       |       31 |        0 |        8 |        0 |     100% |           |
-| context\_logger/logger.py       |       93 |        0 |       14 |        0 |     100% |           |
-| **TOTAL**                       |  **126** |    **0** |   **22** |    **0** | **100%** |           |
+| context\_logger/filter.py       |       34 |        0 |       10 |        0 |     100% |           |
+| context\_logger/logger.py       |      100 |        0 |       16 |        0 |     100% |           |
+| **TOTAL**                       |  **136** |    **0** |   **26** |    **0** | **100%** |           |
 
 
 ## Setup coverage badge
