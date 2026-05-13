@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2024 Attila Gombos <attila.gombos@effective-range.com>
 # SPDX-License-Identifier: MIT
 
+import json
 import logging.handlers
 import os
 import sys
@@ -161,7 +162,14 @@ class Logger(object):
             os.makedirs(directory)
 
     def _enrich_stdlib_log(self, _: logging.Logger, __: str, event_dict: dict[Any, Any]) -> dict[Any, Any]:
-        event_dict.update(event_dict['_record'].msg)
+        try:
+            message = event_dict['_record'].msg
+            if isinstance(message, dict):
+                event_dict.update(message)
+            else:
+                event_dict.update(json.loads(str(message)))
+        except Exception as exception:
+            print('Failed to handle stdlib log record:', exception)
 
         return event_dict
 

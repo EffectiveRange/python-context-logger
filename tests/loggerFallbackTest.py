@@ -133,6 +133,67 @@ class LoggerFallbackTest(TestCase):
         # Then
         makedirs_mock.assert_not_called()
 
+    def test_enrich_stdlib_log_updates_event_dict_from_mapping_message(self):
+        # Given
+        logger = Logger('example-app', 'INFO', None, 1024, 1, False, 'message')
+        record = MagicMock()
+        record.msg = {'message': 'ok', 'code': 7}
+        event_dict = {'_record': record, 'existing': True}
+
+        # When
+        result = logger._enrich_stdlib_log(logging.getLogger('x'), 'info', event_dict)
+
+        # Then
+        self.assertIs(result, event_dict)
+        self.assertEqual('ok', event_dict.get('message'))
+        self.assertEqual(7, event_dict.get('code'))
+        self.assertTrue(event_dict.get('existing'))
+
+    def test_enrich_stdlib_log_updates_event_dict_from_json_message(self):
+        # Given
+        logger = Logger('example-app', 'INFO', None, 1024, 1, False, 'message')
+        record = MagicMock()
+        record.msg = '{"message": "ok", "code": 9}'
+        event_dict = {'_record': record}
+
+        # When
+        result = logger._enrich_stdlib_log(logging.getLogger('x'), 'info', event_dict)
+
+        # Then
+        self.assertIs(result, event_dict)
+        self.assertEqual('ok', event_dict.get('message'))
+        self.assertEqual(9, event_dict.get('code'))
+
+    def test_enrich_stdlib_log_handles_invalid_message(self):
+        # Given
+        logger = Logger('example-app', 'INFO', None, 1024, 1, False, 'message')
+        record = MagicMock()
+        record.msg = object()
+        event_dict = {'_record': record, 'untouched': 'value'}
+
+        with patch('builtins.print') as print_mock:
+            # When
+            result = logger._enrich_stdlib_log(logging.getLogger('x'), 'info', event_dict)
+
+        # Then
+        self.assertIs(result, event_dict)
+        self.assertEqual('value', event_dict.get('untouched'))
+        print_mock.assert_called_once()
+        self.assertEqual('Failed to handle stdlib log record:', print_mock.call_args.args[0])
+
+    def test_get_foreign_prechain_appends_stdlib_enricher(self):
+        # Given
+        logger = Logger('example-app', 'INFO', None, 1024, 1, False, 'message')
+        logger._shared_processors = ['p1', 'p2']
+
+        # When
+        prechain = logger._get_foreign_prechain()
+
+        # Then
+        self.assertEqual(['p1', 'p2'], prechain[:-1])
+        self.assertIs(prechain[-1].__self__, logger)
+        self.assertIs(prechain[-1].__func__, Logger._enrich_stdlib_log)
+
 
 if __name__ == '__main__':
     unittest.main()

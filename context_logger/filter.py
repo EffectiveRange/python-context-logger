@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2024 Attila Gombos <attila.gombos@effective-range.com>
 # SPDX-License-Identifier: MIT
 
+import json
 import socket
 from importlib.metadata import version, PackageNotFoundError
 from logging import Filter, LogRecord
@@ -22,16 +23,19 @@ class ContextSetupFilter(Filter):
                 record.msg = {self._message_field: record.msg % record.args if record.args else record.msg}
                 record.args = ()
 
-            record.msg['hostname'] = socket.gethostname()
-            record.msg['application'] = self._application_name
-            record.msg['app_version'] = self._get_application_version()
+            if isinstance(record.msg, dict):
+                record.msg['hostname'] = socket.gethostname()
+                record.msg['application'] = self._application_name
+                record.msg['app_version'] = self._get_application_version()
 
-            if 'process_name' in record.msg:
-                record.msg['process_name'] = record.processName
+                if 'process_name' in record.msg:
+                    record.msg['process_name'] = record.processName
 
-            for key, value in self._global_context.items():
-                if key not in record.msg:
-                    record.msg[key] = str(value)
+                for key, value in self._global_context.items():
+                    if key not in record.msg:
+                        record.msg[key] = str(value)
+            else:
+                record.msg = json.loads(str(record.msg))
 
         except Exception as exception:
             print('Failed to handle log record:', exception)
